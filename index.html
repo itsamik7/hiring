@@ -1,0 +1,609 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{padding:1rem}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.header p{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--color-text-primary)}
+.tab.active{color:var(--color-text-primary);border-bottom:2px solid #3266ad;font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.section-title{font-size:14px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;margin-top:20px}
+.candidate-form{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+.form-group input,.form-group select,.form-group textarea{font-size:13px;border-radius:var(--border-radius-md)}
+.form-group textarea{height:60px;resize:vertical}
+.full-width{grid-column:1/-1}
+.criteria-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:1rem}
+.criteria-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
+.criteria-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.criteria-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.criteria-weight{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:2px 8px;border-radius:20px}
+.score-row{display:flex;align-items:center;gap:10px}
+.score-row label{font-size:12px;color:var(--color-text-secondary);min-width:100px}
+.score-display{font-size:13px;font-weight:500;min-width:30px;text-align:right}
+.score-buttons{display:flex;gap:4px}
+.score-btn{width:28px;height:28px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary);transition:all .15s}
+.score-btn:hover{background:var(--color-background-primary)}
+.score-btn.selected{background:#3266ad;color:#fff;border-color:#3266ad}
+.score-note{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.result-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.score-big{font-size:48px;font-weight:500;line-height:1}
+.score-label{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.verdict-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:500;margin-top:8px}
+.verdict-strong{background:#C0DD97;color:#3B6D11}
+.verdict-good{background:#B5D4F4;color:#185FA5}
+.verdict-maybe{background:#FAC775;color:#854F0B}
+.verdict-no{background:#F7C1C1;color:#A32D2D}
+.breakdown-bar{height:6px;border-radius:3px;background:var(--color-background-secondary);margin:4px 0;overflow:hidden}
+.breakdown-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.breakdown-row{margin-bottom:8px}
+.breakdown-label{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:2px}
+.flags{margin-top:12px}
+.flag{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.flag:last-child{border-bottom:none}
+.flag-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.flag-red{background:#E24B4A}
+.flag-amber{background:#EF9F27}
+.flag-green{background:#639922}
+.suggestions{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;margin-top:12px}
+.suggestion-item{font-size:12px;color:var(--color-text-secondary);padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.suggestion-item:last-child{border-bottom:none}
+.tracker-table{width:100%;border-collapse:collapse;font-size:12px}
+.tracker-table th{text-align:left;padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-secondary);font-size:11px;text-transform:uppercase}
+.tracker-table td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.tracker-table tr:hover td{background:var(--color-background-secondary)}
+.status-pill{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-strong{background:#C0DD97;color:#3B6D11}
+.pill-good{background:#B5D4F4;color:#185FA5}
+.pill-maybe{background:#FAC775;color:#854F0B}
+.pill-no{background:#F7C1C1;color:#A32D2D}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.metric-num{font-size:24px;font-weight:500;color:var(--color-text-primary)}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.action-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn-primary{padding:8px 18px;background:#3266ad;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;font-weight:500}
+.btn-primary:hover{background:#185FA5}
+.btn-secondary{padding:8px 18px;background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;color:var(--color-text-primary)}
+.btn-secondary:hover{background:var(--color-background-secondary)}
+.role-question-block{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;margin-bottom:10px}
+.rq-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.rq-item{font-size:12px;color:var(--color-text-secondary);padding:3px 0;display:flex;gap:6px}
+.rq-item::before{content:"Q";font-weight:500;color:#3266ad;flex-shrink:0}
+.q-tag{font-size:10px;background:#B5D4F4;color:#185FA5;padding:1px 6px;border-radius:10px;margin-left:4px}
+.empty-state{text-align:center;padding:3rem;color:var(--color-text-tertiary);font-size:13px}
+</style>
+
+<div class="app">
+<div class="header">
+<h1>Thynaa — Interview Evaluation Dashboard</h1>
+<p>Campus hiring · MAIT · Score, predict, and track candidates across all roles</p>
+</div>
+
+<div class="tabs" id="tabs">
+<button class="tab active" onclick="switchTab('score')">Score Candidate</button>
+<button class="tab" onclick="switchTab('tracker')">All Candidates</button>
+<button class="tab" onclick="switchTab('overview')">Overview</button>
+<button class="tab" onclick="switchTab('questions')">Interview Questions</button>
+</div>
+
+<!-- SCORE PANEL -->
+<div class="panel active" id="panel-score">
+
+<div class="candidate-form">
+<div class="section-title" style="margin-top:0">Candidate info</div>
+<div class="form-grid">
+<div class="form-group"><label>Full name</label><input type="text" id="c-name" placeholder="e.g. Priya Sharma"/></div>
+<div class="form-group"><label>Role applied for</label>
+<select id="c-role" onchange="updateRoleContext()">
+<option value="">Select role...</option>
+<option value="social">Social Media Marketing</option>
+<option value="founders">Founder's Office</option>
+<option value="sales">Direct Sales</option>
+<option value="agro">Agronomist</option>
+<option value="training">Training & Awareness</option>
+<option value="finance">Finance / Investment</option>
+<option value="ai">Agentic AI / Automation</option>
+<option value="corporate">Corporate Partnerships</option>
+<option value="project">Project Coordinator</option>
+<option value="research">Research AI</option>
+</select></div>
+<div class="form-group"><label>College / Year</label><input type="text" id="c-college" placeholder="e.g. MAIT, 3rd Year"/></div>
+<div class="form-group"><label>Assignment submitted?</label>
+<select id="c-assignment"><option value="yes">Yes</option><option value="no">No</option><option value="partial">Partial</option></select></div>
+<div class="form-group full-width"><label>Quick observation (1 line)</label><input type="text" id="c-obs" placeholder="First impression / anything standout..."/></div>
+</div>
+</div>
+
+<div id="role-context" style="background:var(--color-background-info);border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-info);margin-bottom:1rem;display:none"></div>
+
+<div class="section-title">Core culture & intent scoring <span style="font-weight:400;text-transform:none;font-size:12px">(rate 1–5 for each)</span></div>
+
+<div class="criteria-grid" id="criteria-grid">
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Environment fit</span><span class="criteria-weight">Weight: 15%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-env"></div>
+<span class="score-display" id="disp-env">—</span>
+</div>
+<div class="score-note">Comfortable with 3BHK setup, no corporate perks mindset, flexible seating, startup chaos</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Intent to work & pressure tolerance</span><span class="criteria-weight">Weight: 20%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-work"></div>
+<span class="score-display" id="disp-work">—</span>
+</div>
+<div class="score-note">Willingness to go beyond 9-5, handle ambiguous tasks, work under pressure without hand-holding</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Sincerity & learnability</span><span class="criteria-weight">Weight: 15%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-learn"></div>
+<span class="score-display" id="disp-learn">—</span>
+</div>
+<div class="score-note">Honest about gaps, picks up new things fast, doesn't bluff, shows curiosity</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Self-reliance (research before asking)</span><span class="criteria-weight">Weight: 15%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-self"></div>
+<span class="score-display" id="disp-self">—</span>
+</div>
+<div class="score-note">Would try to figure things out first, come with a solution not just a problem</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Culture fit (unsupervised work ethic)</span><span class="criteria-weight">Weight: 15%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-culture"></div>
+<span class="score-display" id="disp-culture">—</span>
+</div>
+<div class="score-note">Would work diligently even when founder isn't around; self-motivated, not slacker</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Ownership mindset</span><span class="criteria-weight">Weight: 10%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-own"></div>
+<span class="score-display" id="disp-own">—</span>
+</div>
+<div class="score-note">Takes full accountability, doesn't pass the buck, cares about outcomes not just tasks</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Mission alignment (natural farming / health)</span><span class="criteria-weight">Weight: 5%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-mission"></div>
+<span class="score-display" id="disp-mission">—</span>
+</div>
+<div class="score-note">Genuinely cares about what Thynaa does, not just using it as a resume filler</div>
+</div>
+
+<div class="criteria-card">
+<div class="criteria-header"><span class="criteria-name">Initiative & ideas (self-starter)</span><span class="criteria-weight">Weight: 5%</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-init"></div>
+<span class="score-display" id="disp-init">—</span>
+</div>
+<div class="score-note">Comes up with their own ideas vs needs constant direction; proactive not reactive</div>
+</div>
+
+</div>
+
+<div class="section-title">Role-specific skill score <span style="font-weight:400;text-transform:none;font-size:12px">(out of 5)</span></div>
+<div class="criteria-card" style="margin-bottom:1rem">
+<div class="criteria-header"><span class="criteria-name" id="skill-label">Select a role first</span><span class="criteria-weight">Weight: Bonus</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-skill"></div>
+<span class="score-display" id="disp-skill">—</span>
+</div>
+<div class="score-note" id="skill-note">Role-specific technical or domain knowledge check</div>
+</div>
+
+<div class="section-title">Assignment quality</div>
+<div class="criteria-card" style="margin-bottom:1.5rem">
+<div class="criteria-header"><span class="criteria-name">Assignment depth & original thinking</span><span class="criteria-weight">Weight: Bonus</span></div>
+<div class="score-row">
+<div class="score-buttons" id="btn-assign"></div>
+<span class="score-display" id="disp-assign">—</span>
+</div>
+<div class="score-note">5 = clearly their own thinking with specifics | 3 = decent ChatGPT with some customization | 1 = pure copy-paste with zero personalization</div>
+</div>
+
+<div class="action-row">
+<button class="btn-primary" onclick="calcScore()">Calculate & predict</button>
+<button class="btn-secondary" onclick="saveCandidate()">Save to tracker</button>
+<button class="btn-secondary" onclick="resetForm()">Clear form</button>
+</div>
+
+<div id="result-area" style="margin-top:1.5rem;display:none">
+<div class="result-card">
+<div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+<div>
+<div class="score-big" id="res-score">—</div>
+<div class="score-label">Overall score / 100</div>
+<div id="res-badge" class="verdict-badge">—</div>
+</div>
+<div style="flex:1;min-width:200px">
+<div id="breakdown-area"></div>
+</div>
+</div>
+</div>
+
+<div class="result-card">
+<div style="font-size:14px;font-weight:500;margin-bottom:10px">Flags & signals</div>
+<div class="flags" id="flags-area"></div>
+</div>
+
+<div class="result-card">
+<div style="font-size:14px;font-weight:500;margin-bottom:8px">Interview suggestions</div>
+<div class="suggestions" id="suggestions-area"></div>
+<div style="margin-top:12px">
+<div style="font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Recommendation</div>
+<div id="recommendation" style="font-size:13px;color:var(--color-text-primary)"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TRACKER PANEL -->
+<div class="panel" id="panel-tracker">
+<div class="metrics-grid" id="tracker-metrics">
+<div class="metric-card"><div class="metric-num" id="tm-total">0</div><div class="metric-label">Total candidates</div></div>
+<div class="metric-card"><div class="metric-num" id="tm-strong">0</div><div class="metric-label">Strong hire</div></div>
+<div class="metric-card"><div class="metric-num" id="tm-good">0</div><div class="metric-label">Good fit</div></div>
+<div class="metric-card"><div class="metric-num" id="tm-maybe">0</div><div class="metric-label">Maybe / 2nd round</div></div>
+<div class="metric-card"><div class="metric-num" id="tm-no">0</div><div class="metric-label">Not suitable</div></div>
+</div>
+
+<div style="overflow-x:auto">
+<table class="tracker-table" id="tracker-table">
+<thead><tr>
+<th>Name</th><th>Role</th><th>Score</th><th>Verdict</th><th>Env fit</th><th>Work ethic</th><th>Self-reliant</th><th>Mission</th><th>Actions</th>
+</tr></thead>
+<tbody id="tracker-body">
+<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px">No candidates saved yet. Score and save from the Score tab.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- OVERVIEW PANEL -->
+<div class="panel" id="panel-overview">
+<div class="section-title" style="margin-top:0">Batch overview</div>
+<div class="metrics-grid">
+<div class="metric-card"><div class="metric-num" id="ov-total">0</div><div class="metric-label">Scored today</div></div>
+<div class="metric-card"><div class="metric-num" id="ov-avg">—</div><div class="metric-label">Avg score</div></div>
+<div class="metric-card"><div class="metric-num" id="ov-top">—</div><div class="metric-label">Top scorer</div></div>
+<div class="metric-card"><div class="metric-num" id="ov-hire">0</div><div class="metric-label">Hire recommendations</div></div>
+</div>
+<div style="position:relative;width:100%;height:280px;margin-bottom:1.5rem">
+<canvas id="overviewChart" role="img" aria-label="Bar chart of candidate scores">Score distribution across candidates</canvas>
+</div>
+<div style="position:relative;width:100%;height:240px">
+<canvas id="roleChart" role="img" aria-label="Candidates by role">Role distribution</canvas>
+</div>
+</div>
+
+<!-- QUESTIONS PANEL -->
+<div class="panel" id="panel-questions">
+<div class="section-title" style="margin-top:0">Core culture questions <span style="text-transform:none;font-weight:400;font-size:12px">(ask all candidates)</span></div>
+
+<div class="role-question-block">
+<div class="rq-title">Environment & comfort check</div>
+<div class="rq-item">We work from a 3BHK flat — desks, floor cushions, no corporate setup. Does that work for you? Walk me through your last study/work setup at home.<span class="q-tag">Env fit</span></div>
+<div class="rq-item">If you had to choose between a big company with AC office vs a startup with floor mattresses and 10x learning — which do you pick and why?<span class="q-tag">Env fit</span></div>
+</div>
+
+<div class="role-question-block">
+<div class="rq-title">Work ethic & pressure</div>
+<div class="rq-item">Tell me about a time you worked on something really hard with a tight deadline. What did you sacrifice?<span class="q-tag">Pressure</span></div>
+<div class="rq-item">If the founder gives you a task at 9pm for tomorrow morning — what happens?<span class="q-tag">Work ethic</span></div>
+<div class="rq-item">Describe a week when everything was chaotic. How did you manage?<span class="q-tag">Pressure</span></div>
+</div>
+
+<div class="role-question-block">
+<div class="rq-title">Self-reliance (research before asking)</div>
+<div class="rq-item">The founder assigns you a task you have absolutely no idea about. Walk me through your next 2 hours step by step.<span class="q-tag">Self-reliant</span></div>
+<div class="rq-item">Tell me about something you learned entirely on your own without anyone teaching you. Why did you learn it?<span class="q-tag">Learnability</span></div>
+<div class="rq-item">If you are stuck on something, at what point do you go to the founder vs figure it out yourself?<span class="q-tag">Self-reliant</span></div>
+</div>
+
+<div class="role-question-block">
+<div class="rq-title">Culture fit (unsupervised accountability)</div>
+<div class="rq-item">If the founder is travelling for a week — no check-ins — what does your work look like that week?<span class="q-tag">Culture fit</span></div>
+<div class="rq-item">Have you ever delivered something no one asked you to, just because you thought it was needed? Tell me about it.<span class="q-tag">Ownership</span></div>
+<div class="rq-item">Give me an example of a time you made a mistake at work/college. How did you handle it?<span class="q-tag">Ownership</span></div>
+</div>
+
+<div class="role-question-block">
+<div class="rq-title">Mission alignment</div>
+<div class="rq-item">What do you know about natural farming or chemical-free food? Do you personally care about this or is it just a job?<span class="q-tag">Mission</span></div>
+<div class="rq-item">Why Thynaa specifically — not just any startup?<span class="q-tag">Mission</span></div>
+</div>
+
+<div class="role-question-block">
+<div class="rq-title">Initiative & ideas</div>
+<div class="rq-item">In your assignment, did you come up with anything that wasn't in the brief? Tell me about it.<span class="q-tag">Initiative</span></div>
+<div class="rq-item">Looking at Thynaa's current situation, what's one thing you'd do differently or improve if you joined?<span class="q-tag">Initiative</span></div>
+</div>
+
+<div class="section-title">Role-specific questions</div>
+<div class="form-group" style="max-width:280px;margin-bottom:1rem">
+<label>Filter by role</label>
+<select onchange="showRoleQs(this.value)">
+<option value="">All roles</option>
+<option value="social">Social Media</option>
+<option value="founders">Founder's Office</option>
+<option value="sales">Direct Sales</option>
+<option value="agro">Agronomist</option>
+<option value="training">Training & Awareness</option>
+<option value="finance">Finance</option>
+<option value="ai">Agentic AI</option>
+<option value="corporate">Corporate Partnerships</option>
+<option value="project">Project Coordinator</option>
+<option value="research">Research AI</option>
+</select>
+</div>
+
+<div id="role-qs-area"></div>
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const scores={env:0,work:0,learn:0,self:0,culture:0,own:0,mission:0,init:0,skill:0,assign:0};
+const weights={env:15,work:20,learn:15,self:15,culture:15,own:10,mission:5,init:5};
+const candidates=[];
+let overviewChart=null,roleChart=null;
+
+const roleContexts={
+social:"Key check: portfolio/content instinct, not just tools knowledge. Do they scroll Instagram analytically?",
+founders:"Key check: can they juggle 5 things at once? Cross-functional thinking is critical here.",
+sales:"Key check: can they sell you anything right now? Energy, persuasion, resilience to rejection.",
+agro:"Key check: actual soil/crop knowledge — not textbook. Field readiness matters most.",
+training:"Key check: public speaking comfort. Ask them to explain something on the spot.",
+finance:"Key check: can they build a basic unit economics model without a template?",
+ai:"Key check: have they actually built/run an AI workflow, or just watched tutorials?",
+corporate:"Key check: corporate communication confidence. Do they sound like someone an HR would trust?",
+project:"Key check: have they ever run a project end-to-end with real accountability?",
+research:"Key check: do they understand data pipelines or just the surface-level AI hype?"
+};
+
+const roleSkills={
+social:{label:"Content & platform knowledge",note:"Rate: 5=has portfolio+growth sense | 3=basic creation skills | 1=just knows platforms exist"},
+founders:{label:"Cross-functional thinking",note:"Rate: 5=can connect dots across sales/ops/marketing | 3=decent structured thinking | 1=siloed"},
+sales:{label:"Sales instinct & persuasion",note:"Rate: 5=natural closer, handles objections well | 3=willing learner | 1=no sales sense at all"},
+agro:{label:"Agronomy/natural farming knowledge",note:"Rate: 5=deep field knowledge | 3=solid academic base | 1=surface level only"},
+training:{label:"Communication & facilitation",note:"Rate: 5=engaging speaker, commands attention | 3=decent but nervous | 1=can't hold a room"},
+finance:{label:"Financial modeling & analysis",note:"Rate: 5=can build models independently | 3=understands concepts | 1=just theory no application"},
+ai:{label:"AI tools & workflow building",note:"Rate: 5=has built real agents/automations | 3=knows tools, some experimentation | 1=conceptual only"},
+corporate:{label:"Corporate pitch & BD sense",note:"Rate: 5=sounds professional, handles objections | 3=okay with coaching | 1=not ready for HR meetings"},
+project:{label:"Project management & execution",note:"Rate: 5=run real projects with measurable outcomes | 3=some coordination exp | 1=theoretical only"},
+research:{label:"Data analysis & AI methodology",note:"Rate: 5=hands-on with real datasets + models | 3=academic understanding | 1=surface-level awareness"}
+};
+
+const roleQs={
+social:["Show me your best piece of content you've made — personal or professional. Why does it work?","If Thynaa's reach is low, what's the first thing you'd look at and change?","How do you decide what topic to post about without being told?","Rate your own video editing skill 1-10 and show us something."],
+founders:["You're managing farm ops, a customer complaint, and a marketing deadline — all at once. Walk me through how you handle this.","Give me an example of something where you took end-to-end ownership — from idea to delivery.","If the founder gives you a half-baked idea at 10pm — what do you do with it?","What's a process you improved without being asked to improve it?"],
+sales:["Sell me this water bottle in 2 minutes.","A society RWA president says 'we're not interested.' What do you say?","What's your personal sales conversion rate in any context — academic project, college event, anything?","How do you build trust with someone who doesn't know your brand?"],
+agro:["What's the difference between Jeevamrut and Ghanjeevamrut? Have you ever made either?","How do you approach soil health assessment for a new piece of land?","Walk me through planning a 1-acre seasonal crop rotation.","What's your experience working on a field — not in a lab?"],
+training:["Explain what Jeevamrut is — as if you're talking to a 45-year-old Gurgaon housewife.","Design a 10-minute ice-breaker activity for a health workshop with 30 people.","How do you handle a disengaged audience in the middle of a session?","Walk me through how you'd pitch a workshop to an RWA secretary."],
+finance:["Build a quick unit economics model for a monthly veggie subscription of ₹2000. What's the margin if delivery costs ₹80 per drop?","What government schemes for agri-startups have you researched? Name 3.","How do you distinguish between a vanity metric and a real business metric?","Walk me through how you'd set up an expense tracking system for a 5-person startup."],
+ai:["What's the most advanced AI workflow you've personally built — not just used?","Explain how LangChain chains work in simple terms.","If you had to automate Thynaa's lead capture-to-follow-up process, what would your stack look like?","What's the difference between an AI assistant and an AI agent?"],
+corporate:["How would you get past a corporate HR's 'we're not interested' in a cold email?","Design a 4-hour farm visit experience for 20 software engineers. What does the day look like?","What would you put in a one-pager to send to a Gurgaon tech company HR?","How do you make a wellness day feel different from a regular team outing?"],
+project:["Walk me through how you'd set up a coaching center from scratch — infrastructure, hiring, operations — in 60 days.","How do you measure whether an NGO or CSR partner is actually the right fit for you?","Give me an example where you had to manage multiple stakeholders with conflicting priorities.","What does a good SOP look like? Show me a structure for one key process."],
+research:["If you were studying weather impact on crop yield — what data sources would you pull first?","What's the difference between supervised and unsupervised learning in an agricultural context?","Walk me through how you'd clean a messy weather dataset before running analysis.","How would you communicate your ML model's output to a farmer who doesn't understand AI?"]
+};
+
+function makeButtons(id,key){
+const c=document.getElementById(id);
+if(!c)return;
+c.innerHTML='';
+for(let i=1;i<=5;i++){
+const b=document.createElement('button');
+b.className='score-btn';
+b.textContent=i;
+b.onclick=()=>setScore(key,i,id,id.replace('btn-','disp-'));
+c.appendChild(b);
+}
+}
+
+['env','work','learn','self','culture','own','mission','init','skill','assign'].forEach(k=>{
+makeButtons('btn-'+k,k);
+});
+
+function setScore(key,val,btnId,dispId){
+scores[key]=val;
+const c=document.getElementById(btnId);
+if(c)c.querySelectorAll('.score-btn').forEach((b,i)=>{b.classList.toggle('selected',i+1<=val)});
+const d=document.getElementById(dispId);
+if(d)d.textContent=val+'/5';
+}
+
+function switchTab(t){
+document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+document.querySelector(`[onclick="switchTab('${t}')"]`).classList.add('active');
+document.getElementById('panel-'+t).classList.add('active');
+if(t==='tracker')updateTracker();
+if(t==='overview')updateOverview();
+if(t==='questions')showRoleQs('');
+}
+
+function updateRoleContext(){
+const r=document.getElementById('c-role').value;
+const ctx=document.getElementById('role-context');
+if(r&&roleContexts[r]){ctx.textContent='Tip: '+roleContexts[r];ctx.style.display='block';}
+else{ctx.style.display='none';}
+if(r&&roleSkills[r]){
+document.getElementById('skill-label').textContent=roleSkills[r].label;
+document.getElementById('skill-note').textContent=roleSkills[r].note;
+}
+}
+
+function calcScore(){
+const name=document.getElementById('c-name').value||'Candidate';
+const coreKeys=['env','work','learn','self','culture','own','mission','init'];
+let filled=coreKeys.filter(k=>scores[k]>0).length;
+if(filled<4){alert('Please score at least 4 core criteria before calculating.');return;}
+let weighted=0;
+coreKeys.forEach(k=>{if(scores[k]>0)weighted+=(scores[k]/5)*weights[k];});
+const baseScore=Math.round(weighted);
+const skillBonus=scores.skill>0?Math.round((scores.skill/5)*5):0;
+const assignBonus=scores.assign>0?Math.round((scores.assign/5)*5):0;
+const total=Math.min(100,baseScore+skillBonus+assignBonus);
+
+const res=document.getElementById('result-area');
+res.style.display='block';
+document.getElementById('res-score').textContent=total;
+
+let verdict,badgeClass,rec;
+if(total>=80){verdict='Strong hire';badgeClass='verdict-strong';rec='Prioritize offer. High intent + culture fit. Assign real ownership from day 1.';}
+else if(total>=65){verdict='Good fit';badgeClass='verdict-good';rec='Solid candidate. Set clear expectations on startup environment. Do one more culture check.';}
+else if(total>=50){verdict='Maybe — 2nd round';badgeClass='verdict-maybe';rec='Has potential but gaps. Consider a short task or second conversation before deciding.';}
+else{verdict='Not suitable right now';badgeClass='verdict-no';rec='Significant gaps in culture or intent. Not aligned with current team needs.';}
+
+document.getElementById('res-badge').textContent=verdict;
+document.getElementById('res-badge').className='verdict-badge '+badgeClass;
+document.getElementById('recommendation').textContent=rec;
+
+const ba=document.getElementById('breakdown-area');
+const colors={env:'#3266ad',work:'#639922',learn:'#3266ad',self:'#854F0B',culture:'#185FA5',own:'#3B6D11',mission:'#0F6E56',init:'#534AB7'};
+const labels={env:'Environment fit',work:'Work ethic',learn:'Learnability',self:'Self-reliance',culture:'Culture fit',own:'Ownership',mission:'Mission align',init:'Initiative'};
+ba.innerHTML=coreKeys.filter(k=>scores[k]>0).map(k=>`
+<div class="breakdown-row">
+<div class="breakdown-label"><span>${labels[k]}</span><span>${scores[k]}/5</span></div>
+<div class="breakdown-bar"><div class="breakdown-fill" style="width:${scores[k]*20}%;background:${colors[k]}"></div></div>
+</div>`).join('');
+
+const flags=[];
+if(scores.env>0&&scores.env<=2)flags.push({color:'flag-red',text:'Low environment fit — explicitly discuss the 3BHK workspace and confirm comfort.'});
+if(scores.work>0&&scores.work<=2)flags.push({color:'flag-red',text:'Work ethic concern — probe further with a scenario question before deciding.'});
+if(scores.self>0&&scores.self<=2)flags.push({color:'flag-amber',text:'Low self-reliance — likely to over-depend on founder. Ask: what do you do when stuck?'});
+if(scores.culture>0&&scores.culture<=2)flags.push({color:'flag-red',text:'Culture risk — unclear if they work well unsupervised. Ask an accountability scenario.'});
+if(scores.mission>0&&scores.mission<=2)flags.push({color:'flag-amber',text:'Mission disconnect — they may leave early once they get a better offer. Probe why Thynaa.'});
+if(scores.assign>0&&scores.assign<=2)flags.push({color:'flag-amber',text:'Assignment was shallow — test if they can think on their feet in the interview itself.'});
+if(scores.init>0&&scores.init<=2)flags.push({color:'flag-amber',text:'Low initiative — may need constant direction. Check if they suggested anything unprompted in assignment.'});
+if(scores.env>=4&&scores.work>=4&&scores.self>=4)flags.push({color:'flag-green',text:'Strong core: environment-ready, work-ethic high, self-reliant. Good startup profile.'});
+if(scores.mission>=4&&scores.init>=4)flags.push({color:'flag-green',text:'Mission-aligned + proactive ideas. Likely to stay and grow with the company.'});
+if(flags.length===0)flags.push({color:'flag-amber',text:'No strong signals yet — probe more before deciding.'});
+
+document.getElementById('flags-area').innerHTML=flags.map(f=>`<div class="flag"><div class="flag-dot ${f.color}"></div><span>${f.text}</span></div>`).join('');
+
+const sug=[];
+if(scores.env<=3)sug.push('Show them the actual workspace photo/video before they commit.');
+if(scores.work<=3)sug.push('Ask: "Tell me about a time you worked past midnight for something you believed in."');
+if(scores.self<=3)sug.push('Give a live task: "Research Jeevamrut in 5 mins and explain it to me." See how they handle it.');
+if(scores.learn<=3)sug.push('Ask: "What was the last thing you taught yourself, and how did you do it?"');
+if(scores.culture<=3)sug.push('Scenario: "Founder is unreachable for 3 days. You hit a blocker. What happens?"');
+if(scores.assign<=3)sug.push('Go through their assignment live — ask them to explain a specific part. See if they understand it or just submitted it.');
+if(scores.mission<=3)sug.push('Ask them to name one thing they know about Thynaa or natural farming that surprised them.');
+if(sug.length===0)sug.push('Strong candidate — focus the rest of the interview on specific role scenarios and expectations setting.');
+
+document.getElementById('suggestions-area').innerHTML=sug.map(s=>`<div class="suggestion-item">${s}</div>`).join('');
+res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function saveCandidate(){
+const name=document.getElementById('c-name').value;
+const role=document.getElementById('c-role').value;
+const roleText=document.getElementById('c-role').options[document.getElementById('c-role').selectedIndex]?.text||'';
+if(!name||!role){alert('Please fill in the name and role before saving.');return;}
+const scoreEl=document.getElementById('res-score').textContent;
+if(scoreEl==='—'){alert('Please calculate the score first.');return;}
+const total=parseInt(scoreEl);
+let verdict='Not suitable';
+if(total>=80)verdict='Strong hire';
+else if(total>=65)verdict='Good fit';
+else if(total>=50)verdict='Maybe';
+candidates.push({name,role,roleText,total,verdict,env:scores.env,work:scores.work,self:scores.self,mission:scores.mission,obs:document.getElementById('c-obs').value});
+alert(`${name} saved to tracker!`);
+updateTracker();
+}
+
+function updateTracker(){
+const body=document.getElementById('tracker-body');
+if(candidates.length===0){body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px">No candidates saved yet.</td></tr>';return;}
+const vc={strong:0,good:0,maybe:0,no:0};
+body.innerHTML=candidates.map((c,i)=>{
+let pc,vt;
+if(c.total>=80){pc='pill-strong';vt='Strong hire';vc.strong++;}
+else if(c.total>=65){pc='pill-good';vt='Good fit';vc.good++;}
+else if(c.total>=50){pc='pill-maybe';vt='Maybe';vc.maybe++;}
+else{pc='pill-no';vt='Not suitable';vc.no++;}
+return`<tr>
+<td style="font-weight:500">${c.name}<br><span style="font-size:11px;color:var(--color-text-secondary)">${c.obs||''}</span></td>
+<td>${c.roleText}</td>
+<td style="font-weight:500">${c.total}</td>
+<td><span class="status-pill ${pc}">${vt}</span></td>
+<td>${c.env?c.env+'/5':'—'}</td>
+<td>${c.work?c.work+'/5':'—'}</td>
+<td>${c.self?c.self+'/5':'—'}</td>
+<td>${c.mission?c.mission+'/5':'—'}</td>
+<td><button class="btn-secondary" style="font-size:11px;padding:4px 10px" onclick="removeCandidate(${i})">Remove</button></td>
+</tr>`;}).join('');
+document.getElementById('tm-total').textContent=candidates.length;
+document.getElementById('tm-strong').textContent=vc.strong;
+document.getElementById('tm-good').textContent=vc.good;
+document.getElementById('tm-maybe').textContent=vc.maybe;
+document.getElementById('tm-no').textContent=vc.no;
+}
+
+function removeCandidate(i){candidates.splice(i,1);updateTracker();}
+
+function updateOverview(){
+document.getElementById('ov-total').textContent=candidates.length;
+if(candidates.length===0){document.getElementById('ov-avg').textContent='—';document.getElementById('ov-top').textContent='—';document.getElementById('ov-hire').textContent='0';return;}
+const avg=Math.round(candidates.reduce((s,c)=>s+c.total,0)/candidates.length);
+const top=candidates.reduce((a,b)=>a.total>b.total?a:b);
+const hires=candidates.filter(c=>c.total>=65).length;
+document.getElementById('ov-avg').textContent=avg;
+document.getElementById('ov-top').textContent=top.name.split(' ')[0];
+document.getElementById('ov-hire').textContent=hires;
+
+const sorted=[...candidates].sort((a,b)=>b.total-a.total);
+const colors=sorted.map(c=>c.total>=80?'#639922':c.total>=65?'#3266ad':c.total>=50?'#EF9F27':'#E24B4A');
+
+if(overviewChart)overviewChart.destroy();
+overviewChart=new Chart(document.getElementById('overviewChart'),{
+type:'bar',
+data:{labels:sorted.map(c=>c.name.split(' ')[0]),datasets:[{label:'Score',data:sorted.map(c=>c.total),backgroundColor:colors,borderRadius:4}]},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(128,128,128,0.1)'}},x:{grid:{display:false}}}}
+});
+
+const roleCounts={};candidates.forEach(c=>{roleCounts[c.roleText]=(roleCounts[c.roleText]||0)+1;});
+const rc=['#3266ad','#639922','#854F0B','#534AB7','#0F6E56','#E24B4A','#3B6D11','#185FA5','#A32D2D'];
+if(roleChart)roleChart.destroy();
+roleChart=new Chart(document.getElementById('roleChart'),{
+type:'doughnut',
+data:{labels:Object.keys(roleCounts),datasets:[{data:Object.values(roleCounts),backgroundColor:rc.slice(0,Object.keys(roleCounts).length)}]},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}
+});
+}
+
+function showRoleQs(role){
+const area=document.getElementById('role-qs-area');
+const roles=role?[role]:Object.keys(roleQs);
+const roleNames={social:'Social Media',founders:"Founder's Office",sales:'Direct Sales',agro:'Agronomist',training:'Training & Awareness',finance:'Finance',ai:'Agentic AI',corporate:'Corporate Partnerships',project:'Project Coordinator',research:'Research AI'};
+area.innerHTML=roles.map(r=>`
+<div class="role-question-block">
+<div class="rq-title">${roleNames[r]||r}</div>
+${roleQs[r].map(q=>`<div class="rq-item">${q}<span class="q-tag">Role-specific</span></div>`).join('')}
+</div>`).join('');
+}
+
+showRoleQs('');
+</script>
