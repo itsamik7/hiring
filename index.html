@@ -1,0 +1,796 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{padding:1rem}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.header p{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--color-text-primary)}
+.tab.active{color:var(--color-text-primary);border-bottom:2px solid #3266ad;font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.sec-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;margin-top:18px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+.fg input,.fg select,.fg textarea{font-size:13px;border-radius:8px}
+.fg textarea{height:56px;resize:vertical}
+.full{grid-column:1/-1}
+.college-row{display:flex;gap:8px;align-items:flex-end}
+.college-row .fg{flex:1}
+.role-ctx{background:#E6F1FB;border-radius:8px;padding:10px 14px;font-size:12px;color:#0C447C;margin-bottom:1rem;display:none}
+.criteria-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:1rem}
+.c-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem}
+.c-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.c-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.c-wt{font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:2px 8px;border-radius:20px}
+.score-row{display:flex;align-items:center;gap:10px}
+.score-btns{display:flex;gap:4px}
+.sb{width:28px;height:28px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary);transition:all .15s}
+.sb:hover{background:var(--color-background-primary)}
+.sb.sel{background:#3266ad;color:#fff;border-color:#3266ad}
+.sd{font-size:13px;font-weight:500;min-width:30px;text-align:right;color:var(--color-text-primary)}
+.sc-note{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.res-score{font-size:48px;font-weight:500;line-height:1;color:var(--color-text-primary)}
+.verdict-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:500;margin-top:8px}
+.vs{background:#C0DD97;color:#3B6D11}.vg{background:#B5D4F4;color:#185FA5}
+.vm{background:#FAC775;color:#854F0B}.vn{background:#F7C1C1;color:#A32D2D}
+.bar-wrap{height:6px;border-radius:3px;background:var(--color-background-secondary);margin:4px 0;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.brow{margin-bottom:8px}
+.brow-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:2px}
+.flags{margin-top:8px}
+.flag{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.flag:last-child{border-bottom:none}
+.fdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.fred{background:#E24B4A}.famb{background:#EF9F27}.fgrn{background:#639922}
+.sugg{background:var(--color-background-secondary);border-radius:8px;padding:1rem;margin-top:10px}
+.si{font-size:12px;color:var(--color-text-secondary);padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.si:last-child{border-bottom:none}
+.action-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn-p{padding:8px 18px;background:#3266ad;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500}
+.btn-p:hover{background:#185FA5}
+.btn-s{padding:8px 18px;background:none;border:0.5px solid var(--color-border-secondary);border-radius:8px;font-size:13px;cursor:pointer;color:var(--color-text-primary)}
+.btn-s:hover{background:var(--color-background-secondary)}
+.btn-dl{padding:8px 18px;background:#27500A;color:#C0DD97;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500}
+.btn-dl:hover{background:#3B6D11}
+.btn-dl-all{padding:8px 18px;background:#0C447C;color:#B5D4F4;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500}
+.btn-dl-all:hover{background:#185FA5}
+.tracker-wrap{overflow-x:auto}
+.tt{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.tt th{text-align:left;padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-secondary);font-size:11px;text-transform:uppercase}
+.tt td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.tt tr:hover td{background:var(--color-background-secondary)}
+.pill{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.ps{background:#C0DD97;color:#3B6D11}.pg{background:#B5D4F4;color:#185FA5}
+.pm{background:#FAC775;color:#854F0B}.pn{background:#F7C1C1;color:#A32D2D}
+.met-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem}
+.met{background:var(--color-background-secondary);border-radius:8px;padding:.875rem}
+.met-n{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.met-l{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.rq-block{background:var(--color-background-secondary);border-radius:8px;padding:1rem;margin-bottom:10px}
+.rq-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.rq-item{font-size:12px;color:var(--color-text-secondary);padding:3px 0;display:flex;gap:6px}
+.rq-item::before{content:"Q";font-weight:500;color:#3266ad;flex-shrink:0}
+.qtag{font-size:10px;background:#B5D4F4;color:#185FA5;padding:1px 6px;border-radius:10px;margin-left:4px;white-space:nowrap}
+</style>
+
+<div class="app">
+<div class="header">
+<h1>Thynaa — Interview Evaluation Dashboard</h1>
+<p>Campus hiring · MAIT · Score, predict, track and download candidate reports</p>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="switchTab('score')">Score Candidate</button>
+<button class="tab" onclick="switchTab('tracker')">All Candidates</button>
+<button class="tab" onclick="switchTab('overview')">Overview</button>
+<button class="tab" onclick="switchTab('questions')">Interview Questions</button>
+</div>
+
+<!-- SCORE -->
+<div class="panel active" id="panel-score">
+
+<div class="card">
+<div class="sec-title" style="margin-top:0">Candidate info</div>
+<div class="form-grid">
+<div class="fg"><label>Full name</label><input type="text" id="c-name" placeholder="e.g. Priya Sharma"/></div>
+<div class="fg"><label>Role applied for</label>
+<select id="c-role" onchange="updateRoleCtx()">
+<option value="">Select role...</option>
+<option value="social">Social Media Marketing</option>
+<option value="founders">Founder's Office</option>
+<option value="sales">Direct Sales</option>
+<option value="agro">Agronomist</option>
+<option value="training">Training & Awareness</option>
+<option value="finance">Finance / Investment</option>
+<option value="ai">Agentic AI / Automation</option>
+<option value="corporate">Corporate Partnerships</option>
+<option value="project">Project Coordinator</option>
+<option value="research">Research AI</option>
+</select></div>
+<div class="fg"><label>College name</label><input type="text" id="c-college" placeholder="e.g. MAIT"/></div>
+<div class="fg"><label>Year / Branch</label><input type="text" id="c-year" placeholder="e.g. 3rd Year, CSE"/></div>
+<div class="fg"><label>Assignment submitted?</label>
+<select id="c-assignment"><option value="yes">Yes</option><option value="no">No</option><option value="partial">Partial</option></select></div>
+<div class="fg full"><label>Quick observation (1 line)</label><input type="text" id="c-obs" placeholder="First impression or anything standout..."/></div>
+</div>
+</div>
+
+<div class="role-ctx" id="role-ctx"></div>
+
+<div class="sec-title">Core culture & intent scoring <span style="text-transform:none;font-weight:400;font-size:12px">(rate 1–5 for each)</span></div>
+
+<div class="criteria-grid">
+<div class="c-card"><div class="c-hdr"><span class="c-name">Environment fit</span><span class="c-wt">15%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-env"></div><span class="sd" id="d-env">—</span></div>
+<div class="sc-note">Comfortable with 3BHK setup, no corporate perks mindset, startup chaos</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Intent to work & pressure tolerance</span><span class="c-wt">20%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-work"></div><span class="sd" id="d-work">—</span></div>
+<div class="sc-note">Willingness to go beyond 9-5, handle ambiguous tasks, work without hand-holding</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Sincerity & learnability</span><span class="c-wt">15%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-learn"></div><span class="sd" id="d-learn">—</span></div>
+<div class="sc-note">Honest about gaps, picks up new things fast, doesn't bluff, shows curiosity</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Self-reliance (research before asking)</span><span class="c-wt">15%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-self"></div><span class="sd" id="d-self">—</span></div>
+<div class="sc-note">Tries to figure things out first, comes with solution not just a problem</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Culture fit (unsupervised work ethic)</span><span class="c-wt">15%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-culture"></div><span class="sd" id="d-culture">—</span></div>
+<div class="sc-note">Works diligently even when founder isn't around; self-motivated</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Ownership mindset</span><span class="c-wt">10%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-own"></div><span class="sd" id="d-own">—</span></div>
+<div class="sc-note">Takes full accountability, doesn't pass the buck, cares about outcomes</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Mission alignment (natural farming / health)</span><span class="c-wt">5%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-mission"></div><span class="sd" id="d-mission">—</span></div>
+<div class="sc-note">Genuinely cares about what Thynaa does, not just a resume filler</div></div>
+
+<div class="c-card"><div class="c-hdr"><span class="c-name">Initiative & ideas (self-starter)</span><span class="c-wt">5%</span></div>
+<div class="score-row"><div class="score-btns" id="btn-init"></div><span class="sd" id="d-init">—</span></div>
+<div class="sc-note">Comes up with own ideas vs needs constant direction; proactive not reactive</div></div>
+</div>
+
+<div class="sec-title">Role-specific skill <span style="text-transform:none;font-weight:400;font-size:12px">(bonus points)</span></div>
+<div class="c-card" style="margin-bottom:1rem">
+<div class="c-hdr"><span class="c-name" id="skill-lbl">Select a role first</span><span class="c-wt">Bonus</span></div>
+<div class="score-row"><div class="score-btns" id="btn-skill"></div><span class="sd" id="d-skill">—</span></div>
+<div class="sc-note" id="skill-note">Role-specific technical or domain knowledge check</div>
+</div>
+
+<div class="sec-title">Assignment quality <span style="text-transform:none;font-weight:400;font-size:12px">(bonus points)</span></div>
+<div class="c-card" style="margin-bottom:1.5rem">
+<div class="c-hdr"><span class="c-name">Assignment depth & original thinking</span><span class="c-wt">Bonus</span></div>
+<div class="score-row"><div class="score-btns" id="btn-assign"></div><span class="sd" id="d-assign">—</span></div>
+<div class="sc-note">5=own thinking with specifics | 3=decent ChatGPT with customization | 1=pure copy-paste</div>
+</div>
+
+<div class="action-row">
+<button class="btn-p" onclick="calcScore()">Calculate & predict</button>
+<button class="btn-s" onclick="saveCandidate()">Save to tracker</button>
+<button class="btn-s" onclick="resetForm()">Clear form</button>
+</div>
+
+<div id="result-area" style="margin-top:1.5rem;display:none">
+<div class="card">
+<div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+<div>
+<div class="res-score" id="res-score">—</div>
+<div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Overall score / 100</div>
+<div id="res-badge" class="verdict-badge">—</div>
+</div>
+<div style="flex:1;min-width:180px" id="breakdown-area"></div>
+</div>
+</div>
+<div class="card">
+<div style="font-size:14px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary)">Flags & signals</div>
+<div class="flags" id="flags-area"></div>
+</div>
+<div class="card">
+<div style="font-size:14px;font-weight:500;margin-bottom:8px;color:var(--color-text-primary)">Interview suggestions</div>
+<div class="sugg" id="sugg-area"></div>
+<div style="margin-top:12px">
+<div style="font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Recommendation</div>
+<div id="recommendation" style="font-size:13px;color:var(--color-text-primary)"></div>
+</div>
+</div>
+<div class="action-row">
+<button class="btn-dl" onclick="downloadIndividualPDF()">Download candidate PDF</button>
+</div>
+</div>
+</div>
+
+<!-- TRACKER -->
+<div class="panel" id="panel-tracker">
+<div class="met-grid" id="tracker-mets">
+<div class="met"><div class="met-n" id="tm-total">0</div><div class="met-l">Total</div></div>
+<div class="met"><div class="met-n" id="tm-strong">0</div><div class="met-l">Strong hire</div></div>
+<div class="met"><div class="met-n" id="tm-good">0</div><div class="met-l">Good fit</div></div>
+<div class="met"><div class="met-n" id="tm-maybe">0</div><div class="met-l">Maybe</div></div>
+<div class="met"><div class="met-n" id="tm-no">0</div><div class="met-l">Not suitable</div></div>
+</div>
+<div class="action-row" style="margin-bottom:1rem">
+<button class="btn-dl-all" onclick="downloadAllPDF()">Download full batch report PDF</button>
+</div>
+<div class="tracker-wrap">
+<table class="tt" id="tracker-table">
+<thead><tr>
+<th>Name</th><th>College</th><th>Role</th><th>Score</th><th>Verdict</th><th>Work</th><th>Self-reliant</th><th>Mission</th><th>Actions</th>
+</tr></thead>
+<tbody id="tracker-body">
+<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px">No candidates saved yet.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel" id="panel-overview">
+<div class="sec-title" style="margin-top:0">Batch overview</div>
+<div class="met-grid">
+<div class="met"><div class="met-n" id="ov-total">0</div><div class="met-l">Scored total</div></div>
+<div class="met"><div class="met-n" id="ov-avg">—</div><div class="met-l">Avg score</div></div>
+<div class="met"><div class="met-n" id="ov-top">—</div><div class="met-l">Top scorer</div></div>
+<div class="met"><div class="met-n" id="ov-hire">0</div><div class="met-l">Hire recommendations</div></div>
+</div>
+<div style="position:relative;width:100%;height:280px;margin-bottom:1.5rem">
+<canvas id="overviewChart" role="img" aria-label="Bar chart of candidate scores">Score distribution</canvas>
+</div>
+<div style="position:relative;width:100%;height:240px">
+<canvas id="roleChart" role="img" aria-label="Candidates by role">Role distribution</canvas>
+</div>
+</div>
+
+<!-- QUESTIONS -->
+<div class="panel" id="panel-questions">
+<div class="sec-title" style="margin-top:0">Core culture questions <span style="text-transform:none;font-weight:400;font-size:12px">(ask all candidates)</span></div>
+<div class="rq-block"><div class="rq-title">Environment & comfort check</div>
+<div class="rq-item">We work from a 3BHK flat — desks, floor cushions, no corporate setup. Does that work for you? Walk me through your last study/work setup at home.<span class="qtag">Env fit</span></div>
+<div class="rq-item">If you had to choose between a big company with AC office vs a startup with floor mattresses and 10x learning — which do you pick and why?<span class="qtag">Env fit</span></div></div>
+<div class="rq-block"><div class="rq-title">Work ethic & pressure</div>
+<div class="rq-item">Tell me about a time you worked on something really hard with a tight deadline. What did you sacrifice?<span class="qtag">Pressure</span></div>
+<div class="rq-item">If the founder gives you a task at 9pm for tomorrow morning — what happens?<span class="qtag">Work ethic</span></div>
+<div class="rq-item">Describe a week when everything was chaotic. How did you manage?<span class="qtag">Pressure</span></div></div>
+<div class="rq-block"><div class="rq-title">Self-reliance</div>
+<div class="rq-item">The founder assigns you a task you have absolutely no idea about. Walk me through your next 2 hours step by step.<span class="qtag">Self-reliant</span></div>
+<div class="rq-item">Tell me about something you learned entirely on your own without anyone teaching you. Why?<span class="qtag">Learnability</span></div>
+<div class="rq-item">At what point do you go to the founder vs figure it out yourself?<span class="qtag">Self-reliant</span></div></div>
+<div class="rq-block"><div class="rq-title">Culture fit & ownership</div>
+<div class="rq-item">If the founder is travelling for a week — no check-ins — what does your work look like that week?<span class="qtag">Culture fit</span></div>
+<div class="rq-item">Have you ever delivered something no one asked you to, just because you thought it was needed?<span class="qtag">Ownership</span></div>
+<div class="rq-item">Give me an example of a time you made a mistake. How did you handle it?<span class="qtag">Ownership</span></div></div>
+<div class="rq-block"><div class="rq-title">Mission alignment & initiative</div>
+<div class="rq-item">What do you know about natural farming or chemical-free food? Do you personally care or is it just a job?<span class="qtag">Mission</span></div>
+<div class="rq-item">Why Thynaa specifically — not just any startup?<span class="qtag">Mission</span></div>
+<div class="rq-item">Looking at Thynaa today, what's one thing you'd improve if you joined from day 1?<span class="qtag">Initiative</span></div></div>
+
+<div class="sec-title">Role-specific questions</div>
+<div class="fg" style="max-width:260px;margin-bottom:1rem">
+<label>Filter by role</label>
+<select onchange="showRoleQs(this.value)">
+<option value="">All roles</option>
+<option value="social">Social Media</option>
+<option value="founders">Founder's Office</option>
+<option value="sales">Direct Sales</option>
+<option value="agro">Agronomist</option>
+<option value="training">Training & Awareness</option>
+<option value="finance">Finance</option>
+<option value="ai">Agentic AI</option>
+<option value="corporate">Corporate Partnerships</option>
+<option value="project">Project Coordinator</option>
+<option value="research">Research AI</option>
+</select>
+</div>
+<div id="role-qs-area"></div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const SC={env:0,work:0,learn:0,self:0,culture:0,own:0,mission:0,init:0,skill:0,assign:0};
+const WT={env:15,work:20,learn:15,self:15,culture:15,own:10,mission:5,init:5};
+const candidates=[];
+let ovChart=null,rlChart=null;
+let lastResult=null;
+
+const roleCtxMap={
+social:"Key check: portfolio/content instinct. Do they scroll Instagram analytically?",
+founders:"Key check: can they juggle 5 things at once? Cross-functional thinking is critical.",
+sales:"Key check: can they sell you something right now? Energy + persuasion + resilience.",
+agro:"Key check: actual soil/crop knowledge — not textbook. Field readiness matters most.",
+training:"Key check: public speaking comfort. Ask them to explain something on the spot.",
+finance:"Key check: can they build a basic unit economics model without a template?",
+ai:"Key check: have they actually built/run an AI workflow, or just watched tutorials?",
+corporate:"Key check: corporate communication confidence. Would an HR trust them?",
+project:"Key check: have they run a project end-to-end with real accountability?",
+research:"Key check: do they understand data pipelines or just the surface-level AI hype?"
+};
+const roleSkills={
+social:{l:"Content & platform knowledge",n:"5=portfolio+growth sense | 3=basic creation | 1=just knows platforms exist"},
+founders:{l:"Cross-functional thinking",n:"5=connects dots across ops/sales/marketing | 3=decent structured thinking | 1=siloed"},
+sales:{l:"Sales instinct & persuasion",n:"5=natural closer, handles objections | 3=willing learner | 1=no sales sense"},
+agro:{l:"Agronomy / natural farming knowledge",n:"5=deep field knowledge | 3=solid academic base | 1=surface level"},
+training:{l:"Communication & facilitation",n:"5=engaging, commands attention | 3=decent but nervous | 1=can't hold a room"},
+finance:{l:"Financial modeling & analysis",n:"5=builds models independently | 3=understands concepts | 1=theory only"},
+ai:{l:"AI tools & workflow building",n:"5=built real agents/automations | 3=knows tools, some experiments | 1=conceptual only"},
+corporate:{l:"Corporate pitch & BD sense",n:"5=handles objections professionally | 3=okay with coaching | 1=not ready for HR meetings"},
+project:{l:"Project management & execution",n:"5=ran real projects with outcomes | 3=some coordination exp | 1=theoretical only"},
+research:{l:"Data analysis & AI methodology",n:"5=hands-on datasets + models | 3=academic understanding | 1=surface-level awareness"}
+};
+const roleQsMap={
+social:["Show me your best piece of content you've made. Why does it work?","If Thynaa's reach is low, what's the first thing you'd change?","How do you decide what to post without being told?","Rate your video editing skill 1-10 and show us something."],
+founders:["You're managing farm ops, a customer complaint, and a marketing deadline — all at once. Walk me through it.","Give an example of end-to-end ownership — from idea to delivery.","Founder gives a half-baked idea at 10pm — what do you do with it?","What's a process you improved without being asked?"],
+sales:["Sell me this water bottle in 2 minutes.","A society RWA president says 'not interested.' What do you say?","What's your personal sales conversion rate in any context?","How do you build trust with someone who doesn't know your brand?"],
+agro:["What's the difference between Jeevamrut and Ghanjeevamrut? Have you made either?","How do you assess soil health for a new piece of land?","Walk me through planning a 1-acre seasonal crop rotation.","What's your experience working on-field — not in a lab?"],
+training:["Explain what Jeevamrut is — as if talking to a 45-year-old Gurgaon housewife.","Design a 10-minute ice-breaker for a health workshop with 30 people.","How do you handle a disengaged audience mid-session?","How would you pitch a workshop to an RWA secretary?"],
+finance:["Build unit economics for a ₹2000/month veggie subscription. Margin if delivery costs ₹80/drop?","What government agri-startup schemes have you researched? Name 3.","How do you distinguish a vanity metric from a real business metric?","Walk me through setting up expense tracking for a 5-person startup."],
+ai:["What's the most advanced AI workflow you've personally built — not just used?","Explain how LangChain chains work in simple terms.","How would you automate Thynaa's lead capture-to-follow-up process? Stack?","What's the difference between an AI assistant and an AI agent?"],
+corporate:["How would you get past a corporate HR's 'not interested' in a cold email?","Design a 4-hour farm visit for 20 software engineers. What does the day look like?","What would you put in a one-pager for a Gurgaon tech company HR?","How do you make a wellness day feel different from a regular team outing?"],
+project:["Walk me through setting up a coaching center from scratch in 60 days.","How do you assess if an NGO/CSR partner is the right fit?","Give an example of managing multiple stakeholders with conflicting priorities.","Show me a structure for one key SOP."],
+research:["If studying weather impact on crop yield — what data sources do you pull first?","Difference between supervised and unsupervised learning in an agricultural context?","How would you clean a messy weather dataset before analysis?","How do you communicate ML model output to a farmer who doesn't understand AI?"]
+};
+const roleNames={social:"Social Media",founders:"Founder's Office",sales:"Direct Sales",agro:"Agronomist",training:"Training & Awareness",finance:"Finance",ai:"Agentic AI",corporate:"Corporate Partnerships",project:"Project Coordinator",research:"Research AI"};
+
+function mkBtns(id,key){
+const c=document.getElementById(id);
+if(!c)return;
+c.innerHTML='';
+for(let i=1;i<=5;i++){
+const b=document.createElement('button');
+b.className='sb';b.textContent=i;
+b.onclick=()=>setScore(key,i,id,'d-'+key);
+c.appendChild(b);
+}
+}
+['env','work','learn','self','culture','own','mission','init','skill','assign'].forEach(k=>mkBtns('btn-'+k,k));
+
+function setScore(key,val,btnId,dispId){
+SC[key]=val;
+document.getElementById(btnId).querySelectorAll('.sb').forEach((b,i)=>b.classList.toggle('sel',i+1<=val));
+const d=document.getElementById(dispId);
+if(d)d.textContent=val+'/5';
+}
+
+function switchTab(t){
+document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+event.currentTarget.classList.add('active');
+document.getElementById('panel-'+t).classList.add('active');
+if(t==='tracker')updateTracker();
+if(t==='overview')updateOverview();
+if(t==='questions')showRoleQs('');
+}
+
+function updateRoleCtx(){
+const r=document.getElementById('c-role').value;
+const ctx=document.getElementById('role-ctx');
+if(r&&roleCtxMap[r]){ctx.textContent='Interviewer tip: '+roleCtxMap[r];ctx.style.display='block';}
+else ctx.style.display='none';
+if(r&&roleSkills[r]){
+document.getElementById('skill-lbl').textContent=roleSkills[r].l;
+document.getElementById('skill-note').textContent=roleSkills[r].n;
+}
+}
+
+function resetForm(){
+document.getElementById('c-name').value='';
+document.getElementById('c-role').value='';
+document.getElementById('c-college').value='';
+document.getElementById('c-year').value='';
+document.getElementById('c-assignment').value='yes';
+document.getElementById('c-obs').value='';
+document.getElementById('role-ctx').style.display='none';
+document.getElementById('skill-lbl').textContent='Select a role first';
+document.getElementById('skill-note').textContent='Role-specific technical or domain knowledge check';
+['env','work','learn','self','culture','own','mission','init','skill','assign'].forEach(k=>{
+SC[k]=0;
+const btns=document.getElementById('btn-'+k);
+if(btns)btns.querySelectorAll('.sb').forEach(b=>b.classList.remove('sel'));
+const d=document.getElementById('d-'+k);
+if(d)d.textContent='—';
+});
+document.getElementById('result-area').style.display='none';
+lastResult=null;
+}
+
+function calcScore(){
+const name=document.getElementById('c-name').value||'Candidate';
+const coreKeys=['env','work','learn','self','culture','own','mission','init'];
+const filled=coreKeys.filter(k=>SC[k]>0).length;
+if(filled<4){alert('Please score at least 4 core criteria before calculating.');return;}
+let weighted=0;
+coreKeys.forEach(k=>{if(SC[k]>0)weighted+=(SC[k]/5)*WT[k];});
+const base=Math.round(weighted);
+const skillB=SC.skill>0?Math.round((SC.skill/5)*5):0;
+const assignB=SC.assign>0?Math.round((SC.assign/5)*5):0;
+const total=Math.min(100,base+skillB+assignB);
+
+let verdict,bc,rec;
+if(total>=80){verdict='Strong hire';bc='vs';rec='Prioritize offer. High intent + culture fit. Assign real ownership from day 1.';}
+else if(total>=65){verdict='Good fit';bc='vg';rec='Solid candidate. Set clear expectations on startup environment. Do one more culture check.';}
+else if(total>=50){verdict='Maybe — 2nd round';bc='vm';rec='Has potential but gaps. Consider a short task or second conversation before deciding.';}
+else{verdict='Not suitable right now';bc='vn';rec='Significant gaps in culture or intent. Not aligned with current team needs.';}
+
+document.getElementById('result-area').style.display='block';
+document.getElementById('res-score').textContent=total;
+const rb=document.getElementById('res-badge');
+rb.textContent=verdict;rb.className='verdict-badge '+bc;
+document.getElementById('recommendation').textContent=rec;
+
+const clrs={env:'#3266ad',work:'#639922',learn:'#3266ad',self:'#854F0B',culture:'#185FA5',own:'#3B6D11',mission:'#0F6E56',init:'#534AB7'};
+const lbls={env:'Environment fit',work:'Work ethic',learn:'Learnability',self:'Self-reliance',culture:'Culture fit',own:'Ownership',mission:'Mission align',init:'Initiative'};
+document.getElementById('breakdown-area').innerHTML=coreKeys.filter(k=>SC[k]>0).map(k=>`
+<div class="brow"><div class="brow-lbl"><span>${lbls[k]}</span><span>${SC[k]}/5</span></div>
+<div class="bar-wrap"><div class="bar-fill" style="width:${SC[k]*20}%;background:${clrs[k]}"></div></div></div>`).join('');
+
+const flags=[];
+if(SC.env>0&&SC.env<=2)flags.push({c:'fred',t:'Low environment fit — explicitly discuss the 3BHK workspace before they commit.'});
+if(SC.work>0&&SC.work<=2)flags.push({c:'fred',t:'Work ethic concern — probe further with a scenario question before deciding.'});
+if(SC.self>0&&SC.self<=2)flags.push({c:'famb',t:'Low self-reliance — likely to over-depend on founder. Ask: what do you do when stuck?'});
+if(SC.culture>0&&SC.culture<=2)flags.push({c:'fred',t:'Culture risk — unclear if they work unsupervised. Ask an accountability scenario.'});
+if(SC.mission>0&&SC.mission<=2)flags.push({c:'famb',t:'Mission disconnect — may leave early. Probe why specifically Thynaa.'});
+if(SC.assign>0&&SC.assign<=2)flags.push({c:'famb',t:'Assignment was shallow — test if they can think on their feet in the interview itself.'});
+if(SC.init>0&&SC.init<=2)flags.push({c:'famb',t:'Low initiative — may need constant direction. Did they suggest anything unprompted?'});
+if(SC.env>=4&&SC.work>=4&&SC.self>=4)flags.push({c:'fgrn',t:'Strong core: environment-ready, work-ethic high, self-reliant. Good startup profile.'});
+if(SC.mission>=4&&SC.init>=4)flags.push({c:'fgrn',t:'Mission-aligned + proactive ideas. Likely to stay and grow with the company.'});
+if(flags.length===0)flags.push({c:'famb',t:'No strong signals yet — probe more before deciding.'});
+document.getElementById('flags-area').innerHTML=flags.map(f=>`<div class="flag"><div class="fdot ${f.c}"></div><span>${f.t}</span></div>`).join('');
+
+const sugs=[];
+if(SC.env<=3)sugs.push('Show them the actual workspace photo/video before they commit.');
+if(SC.work<=3)sugs.push('Ask: "Tell me about a time you worked past midnight for something you believed in."');
+if(SC.self<=3)sugs.push('Give a live task: "Research Jeevamrut in 5 mins and explain it to me."');
+if(SC.learn<=3)sugs.push('Ask: "What was the last thing you taught yourself, and how?"');
+if(SC.culture<=3)sugs.push('Scenario: "Founder is unreachable for 3 days. You hit a blocker. What happens?"');
+if(SC.assign<=3)sugs.push('Go through their assignment live — ask them to explain a specific part.');
+if(SC.mission<=3)sugs.push('Ask them to name one thing about Thynaa or natural farming that surprised them.');
+if(sugs.length===0)sugs.push('Strong candidate — focus on specific role scenarios and expectations setting.');
+document.getElementById('sugg-area').innerHTML=sugs.map(s=>`<div class="si">${s}</div>`).join('');
+
+const role=document.getElementById('c-role').value;
+const roleText=document.getElementById('c-role').options[document.getElementById('c-role').selectedIndex]?.text||'';
+lastResult={
+name:document.getElementById('c-name').value||'Candidate',
+college:document.getElementById('c-college').value||'MAIT',
+year:document.getElementById('c-year').value||'',
+role,roleText,total,verdict,rec,
+scores:{...SC},flags,sugs,
+obs:document.getElementById('c-obs').value,
+assignment:document.getElementById('c-assignment').value,
+date:new Date()
+};
+document.getElementById('result-area').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function saveCandidate(){
+const name=document.getElementById('c-name').value;
+const role=document.getElementById('c-role').value;
+const roleText=document.getElementById('c-role').options[document.getElementById('c-role').selectedIndex]?.text||'';
+if(!name||!role){alert('Please fill in the name and role before saving.');return;}
+if(!lastResult){alert('Please calculate the score first.');return;}
+candidates.push({...lastResult});
+alert(name+' saved to tracker!');
+updateTracker();
+}
+
+function updateTracker(){
+const body=document.getElementById('tracker-body');
+if(candidates.length===0){
+body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px">No candidates saved yet.</td></tr>';
+['tm-total','tm-strong','tm-good','tm-maybe','tm-no'].forEach(id=>document.getElementById(id).textContent='0');
+return;}
+const vc={strong:0,good:0,maybe:0,no:0};
+body.innerHTML=candidates.map((c,i)=>{
+let pc,vt;
+if(c.total>=80){pc='ps';vt='Strong hire';vc.strong++;}
+else if(c.total>=65){pc='pg';vt='Good fit';vc.good++;}
+else if(c.total>=50){pc='pm';vt='Maybe';vc.maybe++;}
+else{pc='pn';vt='Not suitable';vc.no++;}
+return`<tr>
+<td style="font-weight:500">${c.name}<br><span style="font-size:11px;color:var(--color-text-secondary)">${c.obs||''}</span></td>
+<td>${c.college||'—'}</td>
+<td>${c.roleText}</td>
+<td style="font-weight:500">${c.total}</td>
+<td><span class="pill ${pc}">${vt}</span></td>
+<td>${c.scores.work?c.scores.work+'/5':'—'}</td>
+<td>${c.scores.self?c.scores.self+'/5':'—'}</td>
+<td>${c.scores.mission?c.scores.mission+'/5':'—'}</td>
+<td style="display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn-s" style="font-size:11px;padding:4px 10px" onclick="downloadSavedPDF(${i})">PDF</button>
+<button class="btn-s" style="font-size:11px;padding:4px 10px;color:#A32D2D" onclick="removeCandidate(${i})">Remove</button>
+</td></tr>`;}).join('');
+document.getElementById('tm-total').textContent=candidates.length;
+document.getElementById('tm-strong').textContent=vc.strong;
+document.getElementById('tm-good').textContent=vc.good;
+document.getElementById('tm-maybe').textContent=vc.maybe;
+document.getElementById('tm-no').textContent=vc.no;
+}
+
+function removeCandidate(i){if(confirm('Remove this candidate?')){candidates.splice(i,1);updateTracker();}}
+
+function updateOverview(){
+document.getElementById('ov-total').textContent=candidates.length;
+if(candidates.length===0){['ov-avg','ov-top','ov-hire'].forEach(id=>document.getElementById(id).textContent='—');return;}
+const avg=Math.round(candidates.reduce((s,c)=>s+c.total,0)/candidates.length);
+const top=candidates.reduce((a,b)=>a.total>b.total?a:b);
+const hires=candidates.filter(c=>c.total>=65).length;
+document.getElementById('ov-avg').textContent=avg;
+document.getElementById('ov-top').textContent=top.name.split(' ')[0];
+document.getElementById('ov-hire').textContent=hires;
+const sorted=[...candidates].sort((a,b)=>b.total-a.total);
+const colors=sorted.map(c=>c.total>=80?'#639922':c.total>=65?'#3266ad':c.total>=50?'#EF9F27':'#E24B4A');
+if(ovChart)ovChart.destroy();
+ovChart=new Chart(document.getElementById('overviewChart'),{type:'bar',data:{labels:sorted.map(c=>c.name.split(' ')[0]),datasets:[{label:'Score',data:sorted.map(c=>c.total),backgroundColor:colors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(128,128,128,0.1)'}},x:{grid:{display:false}}}}});
+const rc={};candidates.forEach(c=>{rc[c.roleText]=(rc[c.roleText]||0)+1;});
+const pal=['#3266ad','#639922','#854F0B','#534AB7','#0F6E56','#E24B4A','#3B6D11','#185FA5','#A32D2D'];
+if(rlChart)rlChart.destroy();
+rlChart=new Chart(document.getElementById('roleChart'),{type:'doughnut',data:{labels:Object.keys(rc),datasets:[{data:Object.values(rc),backgroundColor:pal.slice(0,Object.keys(rc).length)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+}
+
+function showRoleQs(role){
+const area=document.getElementById('role-qs-area');
+const roles=role?[role]:Object.keys(roleQsMap);
+area.innerHTML=roles.map(r=>`<div class="rq-block"><div class="rq-title">${roleNames[r]||r}</div>${roleQsMap[r].map(q=>`<div class="rq-item">${q}<span class="qtag">Role-specific</span></div>`).join('')}</div>`).join('');
+}
+
+function fmtDate(d){
+const dd=String(d.getDate()).padStart(2,'0');
+const mm=String(d.getMonth()+1).padStart(2,'0');
+const yy=d.getFullYear();
+return`${dd}-${mm}-${yy}`;
+}
+function fmtDateLong(d){return d.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});}
+
+function buildFileName(college,name,date){
+const c=(college||'MAIT').replace(/\s+/g,'_');
+const n=(name||'Candidate').replace(/\s+/g,'_');
+const dt=fmtDate(date||new Date());
+return`${c}_${n}_${dt}`;
+}
+
+function renderPDFForResult(result){
+const {jsPDF}=window.jspdf;
+const doc=new jsPDF({unit:'mm',format:'a4'});
+const W=210,margin=18,cw=W-margin*2;
+let y=margin;
+
+const scoreColor=result.total>=80?[55,105,34]:result.total>=65?[18,95,165]:result.total>=50?[133,79,11]:[163,45,45];
+const verdictColor=result.total>=80?[192,221,151]:result.total>=65?[181,212,244]:result.total>=50?[250,199,117]:[247,193,193];
+
+doc.setFillColor(18,95,165);
+doc.rect(0,0,W,22,'F');
+doc.setTextColor(255,255,255);
+doc.setFontSize(14);doc.setFont('helvetica','bold');
+doc.text('Thynaa Healthy Naturally',margin,10);
+doc.setFontSize(9);doc.setFont('helvetica','normal');
+doc.text('Interview Evaluation Report — Confidential',margin,16);
+doc.setFontSize(8);
+doc.text('Generated: '+fmtDateLong(result.date||new Date()),W-margin,16,{align:'right'});
+y=30;
+
+doc.setTextColor(0,0,0);
+doc.setFillColor(245,247,250);
+doc.roundedRect(margin,y,cw,30,2,2,'F');
+doc.setFontSize(15);doc.setFont('helvetica','bold');
+doc.setTextColor(20,20,20);
+doc.text(result.name,margin+6,y+9);
+doc.setFontSize(9);doc.setFont('helvetica','normal');
+doc.setTextColor(80,80,80);
+doc.text('Role: '+result.roleText,margin+6,y+16);
+doc.text('College: '+(result.college||'—')+'  |  '+( result.year||''),margin+6,y+22);
+doc.text('Assignment: '+(result.assignment||'—')+(result.obs?' | Obs: '+result.obs:''),margin+6,y+28);
+y+=36;
+
+doc.setFillColor(...verdictColor);
+doc.roundedRect(margin,y,50,22,2,2,'F');
+doc.setFontSize(26);doc.setFont('helvetica','bold');
+doc.setTextColor(...scoreColor);
+doc.text(String(result.total),margin+8,y+16);
+doc.setFontSize(8);doc.setFont('helvetica','normal');
+doc.setTextColor(...scoreColor);
+doc.text('Score / 100',margin+8,y+21);
+
+doc.setFillColor(240,244,250);
+doc.roundedRect(margin+55,y,cw-55,22,2,2,'F');
+doc.setFontSize(11);doc.setFont('helvetica','bold');
+doc.setTextColor(...scoreColor);
+doc.text(result.verdict,margin+60,y+9);
+doc.setFontSize(8);doc.setFont('helvetica','normal');
+doc.setTextColor(60,60,60);
+const recLines=doc.splitTextToSize(result.rec,cw-65);
+doc.text(recLines,margin+60,y+16);
+y+=30;
+
+doc.setFontSize(10);doc.setFont('helvetica','bold');
+doc.setTextColor(18,95,165);
+doc.text('Score Breakdown',margin,y);
+y+=5;
+const coreKeys=['env','work','learn','self','culture','own','mission','init'];
+const lbls={env:'Environment fit',work:'Work ethic',learn:'Learnability',self:'Self-reliance',culture:'Culture fit',own:'Ownership',mission:'Mission alignment',init:'Initiative'};
+const wts={env:15,work:20,learn:15,self:15,culture:15,own:10,mission:5,init:5};
+coreKeys.forEach(k=>{
+if(!result.scores[k])return;
+const pct=result.scores[k]/5;
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+doc.text(lbls[k]+' ('+wts[k]+'%)',margin,y+4);
+doc.text(result.scores[k]+'/5',W-margin,y+4,{align:'right'});
+doc.setFillColor(220,225,235);
+doc.roundedRect(margin+52,y,cw-70,4,1,1,'F');
+const fc=result.scores[k]>=4?[99,153,34]:result.scores[k]>=3?[50,102,173]:[226,75,74];
+doc.setFillColor(...fc);
+doc.roundedRect(margin+52,y,(cw-70)*pct,4,1,1,'F');
+y+=9;
+});
+if(result.scores.skill>0){
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+doc.text('Role skill (bonus)',margin,y+4);
+doc.text(result.scores.skill+'/5',W-margin,y+4,{align:'right'});
+doc.setFillColor(220,225,235);doc.roundedRect(margin+52,y,cw-70,4,1,1,'F');
+doc.setFillColor(99,153,34);doc.roundedRect(margin+52,y,(cw-70)*(result.scores.skill/5),4,1,1,'F');
+y+=9;
+}
+if(result.scores.assign>0){
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+doc.text('Assignment quality (bonus)',margin,y+4);
+doc.text(result.scores.assign+'/5',W-margin,y+4,{align:'right'});
+doc.setFillColor(220,225,235);doc.roundedRect(margin+52,y,cw-70,4,1,1,'F');
+doc.setFillColor(99,153,34);doc.roundedRect(margin+52,y,(cw-70)*(result.scores.assign/5),4,1,1,'F');
+y+=9;
+}
+y+=4;
+
+if(result.flags&&result.flags.length>0){
+doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(18,95,165);
+doc.text('Flags & Signals',margin,y);y+=5;
+result.flags.forEach(f=>{
+const fc=f.c==='fred'?[226,75,74]:f.c==='fgrn'?[99,153,34]:[239,159,39];
+doc.setFillColor(...fc);
+doc.circle(margin+2,y+2,1.5,'F');
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+const lines=doc.splitTextToSize(f.t,cw-10);
+doc.text(lines,margin+7,y+3);
+y+=lines.length*5+2;
+if(y>270){doc.addPage();y=margin;}
+});
+y+=3;
+}
+
+if(result.sugs&&result.sugs.length>0){
+doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(18,95,165);
+doc.text('Interview Suggestions',margin,y);y+=5;
+result.sugs.forEach((s,i)=>{
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(40,40,40);
+const lines=doc.splitTextToSize((i+1)+'. '+s,cw-4);
+doc.text(lines,margin,y);
+y+=lines.length*5+2;
+if(y>270){doc.addPage();y=margin;}
+});
+}
+
+doc.setFontSize(7);doc.setTextColor(150,150,150);
+const totalPages=doc.internal.getNumberOfPages();
+for(let i=1;i<=totalPages;i++){
+doc.setPage(i);
+doc.text('Thynaa Healthy Naturally — Confidential Interview Report — Page '+i+' of '+totalPages,W/2,292,{align:'center'});
+}
+return doc;
+}
+
+function downloadIndividualPDF(){
+if(!lastResult){alert('Please calculate the score first.');return;}
+const doc=renderPDFForResult(lastResult);
+const fn=buildFileName(lastResult.college,lastResult.name,lastResult.date)+'.pdf';
+doc.save(fn);
+}
+
+function downloadSavedPDF(i){
+const result=candidates[i];
+if(!result){return;}
+const doc=renderPDFForResult(result);
+const fn=buildFileName(result.college,result.name,result.date)+'.pdf';
+doc.save(fn);
+}
+
+function downloadAllPDF(){
+if(candidates.length===0){alert('No candidates saved yet. Save some candidates first.');return;}
+const {jsPDF}=window.jspdf;
+const doc=new jsPDF({unit:'mm',format:'a4'});
+const W=210,margin=18,cw=W-margin*2;
+let y=margin;
+
+doc.setFillColor(18,95,165);
+doc.rect(0,0,W,26,'F');
+doc.setTextColor(255,255,255);
+doc.setFontSize(16);doc.setFont('helvetica','bold');
+doc.text('Thynaa Healthy Naturally',margin,12);
+doc.setFontSize(10);doc.setFont('helvetica','normal');
+doc.text('Campus Hiring — Full Batch Evaluation Report',margin,19);
+doc.setFontSize(8);
+doc.text('Generated: '+fmtDateLong(new Date()),W-margin,19,{align:'right'});
+y=34;
+
+const total=candidates.length;
+const strong=candidates.filter(c=>c.total>=80).length;
+const good=candidates.filter(c=>c.total>=65&&c.total<80).length;
+const maybe=candidates.filter(c=>c.total>=50&&c.total<65).length;
+const no=candidates.filter(c=>c.total<50).length;
+const avg=total>0?Math.round(candidates.reduce((s,c)=>s+c.total,0)/total):0;
+const topC=total>0?candidates.reduce((a,b)=>a.total>b.total?a:b):null;
+
+doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(18,95,165);
+doc.text('Batch Summary',margin,y);y+=5;
+const summaryData=[['Total candidates',total],['Avg score',avg+'/100'],['Strong hire (80+)',strong],['Good fit (65-79)',good],['Maybe/2nd round (50-64)',maybe],['Not suitable (<50)',no],['Top scorer',topC?topC.name+' ('+topC.total+')':'—']];
+const colW=cw/2;
+summaryData.forEach((row,i)=>{
+const col=i%2;const rowY=y+Math.floor(i/2)*9;
+if(col===0){doc.setFillColor(i%4<2?248:242,248,252);doc.rect(margin,rowY-4,cw,9,'F');}
+doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
+doc.text(row[0],margin+col*colW+4,rowY);
+doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);
+doc.text(String(row[1]),margin+(col+1)*colW-4,rowY,{align:'right'});
+});
+y+=Math.ceil(summaryData.length/2)*9+8;
+
+doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(18,95,165);
+doc.text('All Candidates — Ranked by Score',margin,y);y+=6;
+const sorted=[...candidates].sort((a,b)=>b.total-a.total);
+doc.setFillColor(18,95,165);
+doc.rect(margin,y,cw,7,'F');
+doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont('helvetica','bold');
+const cols=[['#','8'],['Name','38'],['College','30'],['Role','30'],['Score','12'],['Verdict','25'],['Work','12'],['Self','12'],['Mission','12']];
+let cx=margin+2;
+cols.forEach(([h,w])=>{doc.text(h,cx,y+4.5);cx+=parseFloat(w);});
+y+=7;
+sorted.forEach((c,i)=>{
+if(y>275){doc.addPage();y=margin;}
+doc.setFillColor(i%2===0?248:255,i%2===0?250:255,i%2===0?253:255);
+doc.rect(margin,y,cw,8,'F');
+doc.setTextColor(30,30,30);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+const scoreC=c.total>=80?[55,105,34]:c.total>=65?[18,95,165]:c.total>=50?[133,79,11]:[163,45,45];
+cx=margin+2;
+const row=[(i+1),c.name.substring(0,18),(c.college||'—').substring(0,14),(c.roleText||'').substring(0,14),String(c.total),c.verdict.substring(0,14),c.scores.work?c.scores.work+'/5':'—',c.scores.self?c.scores.self+'/5':'—',c.scores.mission?c.scores.mission+'/5':'—'];
+row.forEach((v,ri)=>{
+if(ri===4)doc.setTextColor(...scoreC);else doc.setTextColor(30,30,30);
+doc.text(String(v),cx,y+5.5);
+cx+=parseFloat(cols[ri][1]);
+});
+y+=8;
+});
+y+=8;
+
+if(y>230){doc.addPage();y=margin;}
+doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(18,95,165);
+doc.text('Recommended for hire',margin,y);y+=5;
+const hires=sorted.filter(c=>c.total>=65);
+if(hires.length===0){doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.text('No candidates meet the hire threshold (65+) yet.',margin,y);y+=8;}
+else{
+hires.forEach(c=>{
+if(y>270){doc.addPage();y=margin;}
+doc.setFillColor(c.total>=80?192:181,c.total>=80?221:212,c.total>=80?151:244);
+doc.roundedRect(margin,y,cw,10,1,1,'F');
+doc.setFontSize(8.5);doc.setFont('helvetica','bold');
+doc.setTextColor(c.total>=80?39:12,c.total>=80?109:68,c.total>=80?17:124);
+doc.text(c.name+' — '+c.roleText,margin+4,y+6.5);
+doc.setFont('helvetica','normal');
+doc.text(c.total+'/100 | '+c.verdict,W-margin-4,y+6.5,{align:'right'});
+y+=12;
+});
+}
+
+const pgs=doc.internal.getNumberOfPages();
+for(let i=1;i<=pgs;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(150,150,150);doc.text('Thynaa Healthy Naturally — Confidential Batch Report — Page '+i+' of '+pgs,W/2,292,{align:'center'});}
+
+const today=new Date();
+const fn='MAIT_Batch_Report_'+fmtDate(today)+'.pdf';
+doc.save(fn);
+}
+
+showRoleQs('');
+</script>
